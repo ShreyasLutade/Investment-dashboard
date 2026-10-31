@@ -119,3 +119,6 @@ body{background:var(--bg)}
 .wz::before{content:'';position:absolute;width:120vmax;height:120vmax;left:-30vmax;top:-30vmax;background:conic-gradient(from 0deg,transparent,#D7FF3F10,transparent 30%,#8B6BFF14,transparent 60%,#FF6A4D0e,transparent);animation:rot 40s linear infinite;pointer-events:none}
 .tile,.chips button,.pad button{backdrop-filter:none}
 .segs i{background:var(--a)}.wfoot{background:linear-gradient(transparent,#09090c 40%)}
+.syncb{display:inline-flex;align-items:center;gap:8px}.dot{width:8px;height:8px;border-radius:50%;background:#666}.dot.live{background:var(--a);box-shadow:0 0 10px var(--a)}.dot.error{background:var(--c)}.dot.connecting{background:#FFC552}
+textarea{width:100%;background:#0c0c10;border:1px solid var(--line);color:var(--fg);padding:14px;border-radius:14px;font:13px ui-monospace,monospace;resize:none}
+.sheet .note{margin:10px 0 4px}

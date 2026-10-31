@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence, animate, useMotionValue, useTransform, useScroll, useAnimationFrame } from 'framer-motion'
 import Wizard from './Wizard'
+import SyncSheet from './SyncSheet'
+import { Cfg, loadCfg, saveCfg, connect, remoteSet, remoteDel } from './sync'
 import { Cursor, Splash, Progress, Spotlight, Particles, Tilt, Reveal } from './fx'
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts'
 import { Inv, Kind, Owner, calc, sum, inr, debits } from './calc'
@@ -31,6 +33,8 @@ export default function App() {
   const [list, setList] = useState<Inv[]>(() => JSON.parse(localStorage.getItem(KEY) || '[]'))
   const [view, setView] = useState<typeof VIEWS[number]>('Together')
   const [form, setForm] = useState<Inv | null>(null)
+  const [cfg] = useState<Cfg | null>(loadCfg), [status, setStatus] = useState('connecting'), [syncOpen, setSyncOpen] = useState(false)
+  useEffect(() => { if (!cfg) return; return connect(cfg, JSON.parse(localStorage.getItem(KEY) || '[]'), setList, setStatus) }, [])
   useEffect(() => localStorage.setItem(KEY, JSON.stringify(list)), [list])
 
   const shown = useMemo(() => view === 'Together' ? list : list.filter(i => i.owner === view), [list, view])
@@ -53,10 +57,8 @@ export default function App() {
   const { scrollY } = useScroll(); const hy = useTransform(scrollY, [0, 400], [0, -80]), ho = useTransform(scrollY, [0, 400], [1, .2])
   const people = (['Shreyas', 'Divya'] as Owner[]).map(o => ({ o, ...sum(list.filter(i => i.owner === o)) }))
 
-  const save = (f: Inv) => { setList(l => f.id ? l.map(i => i.id === f.id ? f : i) : [...l, { ...f, id: crypto.randomUUID() }]); setForm(null) }
+  const save = (f: Inv) => { const it = f.id ? f : { ...f, id: crypto.randomUUID() }; setList(l => f.id ? l.map(i => i.id === f.id ? it : i) : [...l, it]); remoteSet(it); setForm(null) }
 
-  const backup = () => { navigator.clipboard.writeText(JSON.stringify(list)); alert('Copied! Paste it in the other phone using Restore.') }
-  const restore = () => { const s = prompt('Paste backup'); if (s) try { setList(JSON.parse(s)) } catch { alert('Invalid') } }
 
   return <>
     <Cursor /><Splash /><Progress /><Spotlight /><Particles />
@@ -64,7 +66,7 @@ export default function App() {
     <div className="wrap">
       <motion.div className="top" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <div className="logo">Shreyas <b>&</b> Divya</div>
-        <div><button className="ghost" onClick={backup}>Backup</button> <button className="ghost" onClick={restore}>Restore</button></div>
+        <button className="ghost syncb" onClick={() => setSyncOpen(true)}><i className={'dot ' + (cfg ? status : 'off')} />{cfg ? (status === 'live' ? 'Synced' : status === 'error' ? 'Sync error' : 'Connecting…') : 'Sync'}</button>
       </motion.div>
 
       <motion.div className="hero" style={{ y: hy, opacity: ho }}>
@@ -118,7 +120,7 @@ export default function App() {
             <div className="v">{inr(c.value)}</div>
             <div className="s">Invested {inr(c.invested)} · <span style={{ color: g >= 0 ? 'var(--a)' : 'var(--c)' }}>{g >= 0 ? '+' : '-'}{inr(Math.abs(g))}</span></div>
             {d && <div className="s">{c.installments} auto-debits done{d.next ? ` · next ${d.next.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}` : ' · completed'}</div>}
-            <div className="row" style={{ marginTop: 14 }}><button className="x" onClick={() => setForm(i)}>Edit</button><button className="x" onClick={() => confirm('Delete?') && setList(l => l.filter(x => x.id !== i.id))}>Delete</button></div>
+            <div className="row" style={{ marginTop: 14 }}><button className="x" onClick={() => setForm(i)}>Edit</button><button className="x" onClick={() => confirm('Delete?') && (setList(l => l.filter(x => x.id !== i.id)), remoteDel(i.id))}>Delete</button></div>
           </Tilt> })}</AnimatePresence>
       </div>
 
@@ -129,6 +131,7 @@ export default function App() {
     <motion.button className="fab" aria-label="Add investment" initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', damping: 12, delay: 2.8 }} whileHover={{ scale: 1.08 }} whileTap={{ scale: .9 }} onClick={() => setForm(blank(view === 'Divya' ? 'Divya' : 'Shreyas'))}>
       <svg viewBox="0 0 100 100" className="ring"><defs><path id="c" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1-76 0" /></defs><text><textPath href="#c" textLength="232" lengthAdjust="spacing">ADD ✦ INVEST ✦ ADD ✦ INVEST ✦</textPath></text></svg><span className="plus">+</span></motion.button>
 
+    <AnimatePresence>{syncOpen && <SyncSheet cfg={cfg} status={status} onClose={() => setSyncOpen(false)} onSave={c => { saveCfg(c); location.reload() }} onOff={() => { saveCfg(null); location.reload() }} />}</AnimatePresence>
     <AnimatePresence>{form && <Wizard key={form.id || 'new'} init={form} onClose={() => setForm(null)} onSave={save} />}</AnimatePresence>
   </>
 }
