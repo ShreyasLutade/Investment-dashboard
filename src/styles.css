@@ -122,3 +122,11 @@ body{background:var(--bg)}
 .syncb{display:inline-flex;align-items:center;gap:8px}.dot{width:8px;height:8px;border-radius:50%;background:#666}.dot.live{background:var(--a);box-shadow:0 0 10px var(--a)}.dot.error{background:var(--c)}.dot.connecting{background:#FFC552}
 textarea{width:100%;background:#0c0c10;border:1px solid var(--line);color:var(--fg);padding:14px;border-radius:14px;font:13px ui-monospace,monospace;resize:none}
 .sheet .note{margin:10px 0 4px}
+.wz{height:100dvh}
+.wbody{padding-top:clamp(6px,2vh,26px);padding-bottom:clamp(90px,14vh,130px)}
+.wt{font-size:clamp(26px,min(8.5vw,5.2vh),54px);margin:clamp(4px,1vh,12px) 0 clamp(10px,2.6vh,30px)}
+.money{font-size:clamp(36px,min(13vw,8vh),84px);margin:0}
+.chips{margin:clamp(6px,1.6vh,18px) 0}.chips button{padding:clamp(6px,1.2vh,10px) 18px}
+.pad{gap:clamp(5px,1vh,8px)}.pad button{height:clamp(38px,6.4vh,58px);font-size:clamp(20px,3.2vh,26px)}
+.wfoot{padding-top:clamp(8px,2vh,18px);padding-bottom:calc(env(safe-area-inset-bottom) + clamp(10px,2vh,18px))}
+.cta{padding:clamp(14px,2.4vh,19px)}
