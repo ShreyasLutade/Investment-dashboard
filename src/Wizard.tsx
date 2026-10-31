@@ -26,7 +26,7 @@ function Money({ value, onChange }: { value: number; onChange: (n: number) => vo
 }
 
 function Slider({ label, value, min, max, step, fmt, onChange }: { label: string; value: number; min: number; max: number; step: number; fmt: string; onChange: (n: number) => void }) {
-  return <div className="sl"><div className="k">{label}</div><div className="slv"><Roll text={fmt} /></div>
+  return <div className="sl"><div className="k">{label}</div><div className="slv"><Roll text={fmt} />{step < 1 && <span className="nudge"><button onClick={() => onChange(Math.max(min, +(value - step).toFixed(2)))}>−</button><button onClick={() => onChange(Math.min(max, +(value + step).toFixed(2)))}>+</button></span>}</div>
     <input type="range" min={min} max={max} step={step} value={value} style={{ ['--p' as any]: `${(value - min) / (max - min) * 100}%` }} onChange={e => onChange(+e.target.value)} /></div>
 }
 
@@ -81,7 +81,7 @@ export default function Wizard({ init, onClose, onSave }: { init: Inv; onClose: 
         {s === 'amount' && <Money value={f.amount} onChange={n => up({ amount: n })} />}
         {s === 'value' && <Money value={f.price || f.amount} onChange={n => up({ price: n })} />}
 
-        {s === 'terms' && <><Slider label={f.kind === 'SIP' ? 'Expected return p.a.' : 'Interest rate p.a.'} value={f.rate} min={0} max={f.kind === 'SIP' ? 25 : 15} step={.1} fmt={f.rate.toFixed(1) + '%'} onChange={n => up({ rate: n })} />
+        {s === 'terms' && <><Slider label={f.kind === 'SIP' ? 'Expected return p.a.' : 'Interest rate p.a.'} value={f.rate} min={0} max={f.kind === 'SIP' ? 25 : 15} step={.01} fmt={f.rate.toFixed(2) + '%'} onChange={n => up({ rate: n })} />
           <Slider label="Duration" value={f.months} min={f.kind === 'SIP' ? 0 : 1} max={f.kind === 'SIP' ? 240 : 120} step={1} fmt={f.months === 0 ? 'Ongoing' : f.months >= 12 ? `${Math.floor(f.months / 12)}y ${f.months % 12 ? f.months % 12 + 'm' : ''}` : f.months + ' mo'} onChange={n => up({ months: n })} />
           <div className="sl"><div className="k">Started on</div><input className="date" type="date" value={f.start} onChange={e => up({ start: e.target.value })} /></div></>}
 
@@ -91,7 +91,7 @@ export default function Wizard({ init, onClose, onSave }: { init: Inv; onClose: 
         {s === 'review' && <div className="ticket">
           <div className="row"><span className="tag">{f.kind}</span><span className="tag">{f.owner}</span></div>
           <h2>{f.name}</h2>
-          {[['Amount', inr(mkt ? f.amount : f.amount) + (sip ? ' / month' : ''), 'amount'], ...(mkt ? [['Worth today', inr(f.price || f.amount), 'value']] : [['Rate', f.rate.toFixed(1) + '% p.a.', 'terms'], ['Duration', f.months ? f.months + ' months' : 'Ongoing', 'terms']]), ...(sip ? [['Debit day', ord(f.day), 'day']] : []), ['Name', f.name, 'name']].map(([a, b, st]) =>
+          {[['Amount', inr(mkt ? f.amount : f.amount) + (sip ? ' / month' : ''), 'amount'], ...(mkt ? [['Worth today', inr(f.price || f.amount), 'value']] : [['Rate', f.rate.toFixed(2) + '% p.a.', 'terms'], ['Duration', f.months ? f.months + ' months' : 'Ongoing', 'terms']]), ...(sip ? [['Debit day', ord(f.day), 'day']] : []), ['Name', f.name, 'name']].map(([a, b, st]) =>
             <motion.button key={a} className="rw" whileTap={{ scale: .98 }} onClick={() => go(steps.indexOf(st))}><span>{a}</span><b>{b}</b></motion.button>)}
           <div className="hl"><div className="k">{p ? 'You will have' : mkt ? 'Gain / loss' : 'Worth today'}</div>
             <div className="hv"><Roll text={inr(p ? p.v : mkt ? now.value - now.invested : now.value)} /></div>

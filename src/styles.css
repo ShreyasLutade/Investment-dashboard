@@ -130,3 +130,5 @@ textarea{width:100%;background:#0c0c10;border:1px solid var(--line);color:var(--
 .pad{gap:clamp(5px,1vh,8px)}.pad button{height:clamp(38px,6.4vh,58px);font-size:clamp(20px,3.2vh,26px)}
 .wfoot{padding-top:clamp(8px,2vh,18px);padding-bottom:calc(env(safe-area-inset-bottom) + clamp(10px,2vh,18px))}
 .cta{padding:clamp(14px,2.4vh,19px)}
+.slv{display:flex;align-items:center;justify-content:space-between}
+.nudge{display:flex;gap:8px}.nudge button{width:44px;height:44px;border-radius:50%;border:1px solid #D7FF3F44;background:none;color:var(--fg);font:700 22px Syne,sans-serif;cursor:pointer}
