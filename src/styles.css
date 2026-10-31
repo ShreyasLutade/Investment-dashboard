@@ -36,3 +36,15 @@ input,select{width:100%;background:#0c0c10;border:1px solid var(--line);color:va
 .marquee{overflow:hidden;white-space:nowrap;margin:50px -18px 0;border-block:1px solid var(--line);padding:14px 0}
 .marquee div{display:inline-block;font:700 clamp(30px,8vw,70px) 'Space Grotesk';color:transparent;-webkit-text-stroke:1px #555;animation:m 25s linear infinite}
 @keyframes m{to{transform:translateX(-50%)}}
+.splash{position:fixed;inset:0;z-index:100;background:#07070a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.sp-t{display:flex;overflow:hidden;font:700 clamp(30px,9vw,90px) 'Space Grotesk';color:var(--fg);padding:10px}
+.sp-l{width:min(300px,60vw);height:3px;background:var(--a);transform-origin:left;border-radius:9px}
+.splash small{color:var(--mut);letter-spacing:.2em;text-transform:uppercase;font-size:11px}
+.prog{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--b),var(--a),var(--c));transform-origin:left;z-index:60}
+.spot{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.parts{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.card{transform-style:preserve-3d}
+.chart{height:280px;margin:6px -10px 0}
+.chip{display:flex;gap:8px;margin-top:10px}
+.sec{overflow:visible}
+@media(prefers-reduced-motion:reduce){.marquee div{animation:none}}
