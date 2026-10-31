@@ -1,0 +1,38 @@
+:root{--bg:#07070a;--fg:#f4f1ea;--mut:#8b8b95;--card:#111116;--line:#22222b;--a:#c6ff3d;--b:#7c5cff;--c:#ff5c8a}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--fg);font-family:Inter,sans-serif;overflow-x:hidden}
+h1,h2,h3,.big{font-family:'Space Grotesk',sans-serif;letter-spacing:-.03em}
+.glow{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.glow i{position:absolute;width:60vmax;height:60vmax;border-radius:50%;filter:blur(90px);opacity:.28}
+.wrap{max-width:1100px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 20px) 18px 120px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.logo{font-weight:700;font-size:18px}.logo b{color:var(--a)}
+.hero{padding:30px 0 10px}.hero small{color:var(--mut);text-transform:uppercase;letter-spacing:.2em;font-size:11px}
+.big{font-size:clamp(46px,13vw,120px);line-height:.95;font-weight:700;margin:10px 0;background:linear-gradient(120deg,var(--fg),var(--a));-webkit-background-clip:text;background-clip:text;color:transparent}
+.gain{display:inline-block;padding:6px 14px;border-radius:99px;background:#c6ff3d1a;color:var(--a);font-weight:600;font-size:14px}
+.gain.neg{background:#ff5c8a1a;color:var(--c)}
+.tabs{display:flex;gap:6px;background:var(--card);padding:5px;border-radius:99px;width:fit-content;margin:26px 0;border:1px solid var(--line);position:relative}
+.tabs button{position:relative;z-index:1;border:0;background:none;color:var(--mut);padding:10px 20px;border-radius:99px;font:600 14px Inter;cursor:pointer}
+.tabs button.on{color:#000}.pill{position:absolute;inset:0;background:var(--a);border-radius:99px;z-index:0}
+.grid{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:800px){.grid{grid-template-columns:1fr 1fr}.two{display:grid;grid-template-columns:380px 1fr;gap:24px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:20px;position:relative;overflow:hidden}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tag{font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
+.k{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.12em}
+.v{font:700 26px 'Space Grotesk'}.s{color:var(--mut);font-size:13px;margin-top:6px}
+.sec{font-size:clamp(28px,6vw,48px);margin:40px 0 16px;font-weight:700}
+.fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:20;border:0;background:var(--a);color:#000;font:700 16px 'Space Grotesk';padding:16px 26px;border-radius:99px;cursor:pointer;box-shadow:0 10px 40px #c6ff3d55}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#16161d;border-radius:30px 30px 0 0;padding:22px 18px calc(env(safe-area-inset-bottom) + 22px);max-height:92vh;overflow:auto;max-width:560px;margin:0 auto}
+.veil{position:fixed;inset:0;background:#000a;z-index:25;backdrop-filter:blur(6px)}
+label{display:block;font-size:11px;color:var(--mut);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.1em}
+input,select{width:100%;background:#0c0c10;border:1px solid var(--line);color:var(--fg);padding:14px;border-radius:14px;font:500 16px Inter}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg button{flex:1;min-width:60px;border:1px solid var(--line);background:#0c0c10;color:var(--fg);padding:12px 6px;border-radius:14px;font:600 14px Inter;cursor:pointer}
+.seg button.on{background:var(--a);color:#000;border-color:var(--a)}
+.go{width:100%;margin-top:20px;border:0;background:var(--a);color:#000;padding:16px;border-radius:16px;font:700 17px 'Space Grotesk';cursor:pointer}
+.x{border:0;background:none;color:var(--mut);cursor:pointer;font-size:13px}
+.ghost{border:1px solid var(--line);background:none;color:var(--mut);padding:8px 14px;border-radius:99px;font:500 12px Inter;cursor:pointer}
+.bar{height:6px;border-radius:9px;background:var(--line);margin-top:14px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--b),var(--a));border-radius:9px}
+.marquee{overflow:hidden;white-space:nowrap;margin:50px -18px 0;border-block:1px solid var(--line);padding:14px 0}
+.marquee div{display:inline-block;font:700 clamp(30px,8vw,70px) 'Space Grotesk';color:transparent;-webkit-text-stroke:1px #555;animation:m 25s linear infinite}
+@keyframes m{to{transform:translateX(-50%)}}
