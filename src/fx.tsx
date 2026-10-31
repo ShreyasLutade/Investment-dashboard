@@ -20,7 +20,7 @@ export function Progress() {
 export function Spotlight() {
   const x = useMotionValue(-500), y = useMotionValue(-500)
   useEffect(() => { const m = (e: PointerEvent) => { x.set(e.clientX); y.set(e.clientY) }; addEventListener('pointermove', m); return () => removeEventListener('pointermove', m) }, [])
-  const bg = useTransform([x, y], ([a, b]) => `radial-gradient(420px circle at ${a}px ${b}px,#c6ff3d22,transparent 70%)`)
+  const bg = useTransform([x, y], ([a, b]) => `radial-gradient(420px circle at ${a}px ${b}px,#E8D2B522,transparent 70%)`)
   return <motion.div className="spot" style={{ background: bg }} />
 }
 
@@ -31,7 +31,7 @@ export function Particles() {
     const rs = () => { w = c.width = innerWidth; h = c.height = innerHeight }; rs(); addEventListener('resize', rs)
     const P = Array.from({ length: 55 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 2 + .5, v: Math.random() * .4 + .1, a: Math.random() }))
     const loop = () => { g.clearRect(0, 0, w, h); P.forEach(p => { p.y -= p.v; p.a += .01; if (p.y < -5) { p.y = h + 5; p.x = Math.random() * w }
-      g.fillStyle = `rgba(198,255,61,${.15 + Math.sin(p.a) * .15})`; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.fill() }); id = requestAnimationFrame(loop) }
+      g.fillStyle = `rgba(232,210,181,${.15 + Math.sin(p.a) * .15})`; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.fill() }); id = requestAnimationFrame(loop) }
     loop(); return () => { cancelAnimationFrame(id); removeEventListener('resize', rs) }
   }, [])
   return <canvas ref={ref} className="parts" />

@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence, animate, useMotionValue, useTransform, useScroll } from 'framer-motion'
+import Wizard from './Wizard'
 import { Splash, Progress, Spotlight, Particles, Tilt, Reveal } from './fx'
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts'
 import { Inv, Kind, Owner, calc, sum, inr, debits } from './calc'
 
 const KINDS: Kind[] = ['FD', 'RD', 'SIP', 'Gold', 'Stock']
-const COLORS: Record<Kind, string> = { FD: '#c6ff3d', RD: '#7c5cff', SIP: '#ff5c8a', Gold: '#ffc83d', Stock: '#3dd6ff' }
+const COLORS: Record<Kind, string> = { FD: '#E8D2B5', RD: '#A5A79B', SIP: '#C9605A', Gold: '#ffc83d', Stock: '#7E8F7A' }
 const VIEWS = ['Together', 'Shreyas', 'Divya'] as const
 const KEY = 'wealth-v1'
 
@@ -42,19 +43,15 @@ export default function App() {
   const { scrollY } = useScroll(); const hy = useTransform(scrollY, [0, 400], [0, -80]), ho = useTransform(scrollY, [0, 400], [1, .2])
   const people = (['Shreyas', 'Divya'] as Owner[]).map(o => ({ o, ...sum(list.filter(i => i.owner === o)) }))
 
-  const save = () => { if (!form || !form.name || !form.amount) return
-    setList(l => form.id ? l.map(i => i.id === form.id ? form : i) : [...l, { ...form, id: crypto.randomUUID() }]); setForm(null) }
-  const num = (k: keyof Inv) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => f && { ...f, [k]: +e.target.value })
-  const txt = (k: keyof Inv) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => f && { ...f, [k]: e.target.value })
-  const sip = form && (form.kind === 'RD' || form.kind === 'SIP'), mkt = form && (form.kind === 'Gold' || form.kind === 'Stock')
+  const save = (f: Inv) => { setList(l => f.id ? l.map(i => i.id === f.id ? f : i) : [...l, { ...f, id: crypto.randomUUID() }]); setForm(null) }
 
   const backup = () => { navigator.clipboard.writeText(JSON.stringify(list)); alert('Copied! Paste it in the other phone using Restore.') }
   const restore = () => { const s = prompt('Paste backup'); if (s) try { setList(JSON.parse(s)) } catch { alert('Invalid') } }
 
   return <>
     <Splash /><Progress /><Spotlight /><Particles />
-    <div className="glow"><motion.i style={{ background: '#7c5cff', top: '-20%', left: '-20%' }} animate={{ x: [0, 80, 0], y: [0, 60, 0] }} transition={{ duration: 18, repeat: Infinity }} />
-      <motion.i style={{ background: '#c6ff3d', bottom: '-30%', right: '-20%', opacity: .15 }} animate={{ x: [0, -80, 0] }} transition={{ duration: 22, repeat: Infinity }} /></div>
+    <div className="glow"><motion.i style={{ background: '#8a1a17', top: '-20%', left: '-20%' }} animate={{ x: [0, 80, 0], y: [0, 60, 0] }} transition={{ duration: 18, repeat: Infinity }} />
+      <motion.i style={{ background: '#E8D2B5', bottom: '-30%', right: '-20%', opacity: .15 }} animate={{ x: [0, -80, 0] }} transition={{ duration: 22, repeat: Infinity }} /></div>
     <div className="wrap">
       <motion.div className="top" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <div className="logo">Shreyas <b>&</b> Divya</div>
@@ -91,14 +88,14 @@ export default function App() {
       <motion.div className="card" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
         <div className="row"><div className="k">Growth over time</div><div className="s" style={{ margin: 0 }}>dashed = next 12 months</div></div>
         {tl.length ? <div className="chart"><ResponsiveContainer><AreaChart data={tl} key={view + list.length}>
-          <defs><linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#c6ff3d" stopOpacity={.5} /><stop offset="100%" stopColor="#c6ff3d" stopOpacity={0} /></linearGradient>
-            <linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#7c5cff" stopOpacity={.4} /><stop offset="100%" stopColor="#7c5cff" stopOpacity={0} /></linearGradient></defs>
+          <defs><linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E8D2B5" stopOpacity={.5} /><stop offset="100%" stopColor="#E8D2B5" stopOpacity={0} /></linearGradient>
+            <linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#A5A79B" stopOpacity={.4} /><stop offset="100%" stopColor="#A5A79B" stopOpacity={0} /></linearGradient></defs>
           <XAxis dataKey="m" tick={{ fill: '#8b8b95', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" minTickGap={30} />
           <YAxis hide domain={['dataMin', 'auto']} />
-          <Tooltip contentStyle={{ background: '#16161d', border: '1px solid #22222b', borderRadius: 14 }} formatter={(v: any, n: any) => [inr(v), n === 'value' ? 'Worth' : n === 'invested' ? 'Invested' : 'Projected']} />
-          <Area type="monotone" dataKey="invested" stroke="#7c5cff" strokeWidth={2} fill="url(#gi)" animationDuration={2200} connectNulls />
-          <Area type="monotone" dataKey="value" stroke="#c6ff3d" strokeWidth={3} fill="url(#gv)" animationDuration={2600} connectNulls />
-          <Area type="monotone" dataKey="proj" stroke="#c6ff3d" strokeWidth={2} strokeDasharray="6 6" fill="none" animationBegin={2400} animationDuration={1500} connectNulls />
+          <Tooltip contentStyle={{ background: '#3a0907', border: '1px solid #5c2a28', borderRadius: 14 }} formatter={(v: any, n: any) => [inr(v), n === 'value' ? 'Worth' : n === 'invested' ? 'Invested' : 'Projected']} />
+          <Area type="monotone" dataKey="invested" stroke="#A5A79B" strokeWidth={2} fill="url(#gi)" animationDuration={2200} connectNulls />
+          <Area type="monotone" dataKey="value" stroke="#E8D2B5" strokeWidth={3} fill="url(#gv)" animationDuration={2600} connectNulls />
+          <Area type="monotone" dataKey="proj" stroke="#E8D2B5" strokeWidth={2} strokeDasharray="6 6" fill="none" animationBegin={2400} animationDuration={1500} connectNulls />
         </AreaChart></ResponsiveContainer></div> : <div className="s">Your growth curve appears once you add investments.</div>}
       </motion.div>
 
@@ -120,22 +117,6 @@ export default function App() {
 
     <motion.button className="fab" whileTap={{ scale: .92 }} initial={{ scale: 0 }} animate={{ scale: 1 }} onClick={() => setForm(blank(view === 'Divya' ? 'Divya' : 'Shreyas'))}>+ Add</motion.button>
 
-    <AnimatePresence>{form && <>
-      <motion.div className="veil" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setForm(null)} />
-      <motion.div className="sheet" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 30, stiffness: 300 }}>
-        <h2>{form.id ? 'Edit' : 'New'} investment</h2>
-        <label>Whose</label><div className="seg">{(['Shreyas', 'Divya'] as Owner[]).map(o => <button key={o} className={form.owner === o ? 'on' : ''} onClick={() => setForm({ ...form, owner: o })}>{o}</button>)}</div>
-        <label>Type</label><div className="seg">{KINDS.map(k => <button key={k} className={form.kind === k ? 'on' : ''} onClick={() => setForm({ ...form, kind: k })}>{k}</button>)}</div>
-        <label>Name</label><input value={form.name} onChange={txt('name')} placeholder="e.g. SBI RD, Nifty 50 SIP, Reliance" />
-        <label>{form.kind === 'FD' ? 'Deposit amount (₹)' : sip ? 'Monthly amount (₹)' : form.kind === 'Gold' ? 'Buy price per gram (₹)' : 'Buy price per share (₹)'}</label>
-        <input type="number" inputMode="decimal" value={form.amount || ''} onChange={num('amount')} />
-        {mkt && <><label>{form.kind === 'Gold' ? 'Grams' : 'Shares'}</label><input type="number" inputMode="decimal" value={form.qty || ''} onChange={num('qty')} />
-          <label>Current price per unit (₹)</label><input type="number" inputMode="decimal" value={form.price || ''} onChange={num('price')} /></>}
-        {!mkt && <><label>{form.kind === 'SIP' ? 'Expected return % p.a.' : 'Interest % p.a.'}</label><input type="number" inputMode="decimal" value={form.rate} onChange={num('rate')} />
-          <label>Duration (months){form.kind === 'SIP' ? ' – 0 = ongoing' : ''}</label><input type="number" inputMode="numeric" value={form.months} onChange={num('months')} /></>}
-        {sip && <><label>Auto-debit day of month</label><input type="number" min={1} max={31} value={form.day} onChange={num('day')} /></>}
-        <label>Start date</label><input type="date" value={form.start} onChange={txt('start')} />
-        <button className="go" onClick={save}>Save</button>
-      </motion.div></>}</AnimatePresence>
+    <AnimatePresence>{form && <Wizard key={form.id || 'new'} init={form} onClose={() => setForm(null)} onSave={save} />}</AnimatePresence>
   </>
 }
