@@ -20,7 +20,7 @@ function Money({ value, onChange }: { value: number; onChange: (n: number) => vo
   return <>
     <div className="money"><span className="rs">₹</span><Roll text={value.toLocaleString('en-IN')} /></div>
     <div className="chips">{[[1000, '+1K'], [10000, '+10K'], [100000, '+1L']].map(([n, l]) => <motion.button key={l} whileTap={{ scale: .9 }} onClick={() => set(value + (n as number))}>{l}</motion.button>)}</div>
-    <div className="pad">{['1', '2', '3', '4', '5', '6', '7', '8', '9', '00', '0', '⌫'].map(k => <motion.button key={k} whileTap={{ scale: .88, backgroundColor: '#E8D2B533' }}
+    <div className="pad">{['1', '2', '3', '4', '5', '6', '7', '8', '9', '00', '0', '⌫'].map(k => <motion.button key={k} whileTap={{ scale: .88, backgroundColor: '#D7FF3F33' }}
       onClick={() => k === '⌫' ? set(Math.floor(value / 10)) : set(k === '00' ? value * 100 : value * 10 + +k)}>{k}</motion.button>)}</div>
   </>
 }
@@ -49,16 +49,16 @@ export default function Wizard({ init, onClose, onSave }: { init: Inv; onClose: 
 
   const title: Record<string, string> = { who: 'Whose investment is this?', type: 'What are you investing in?', name: 'Give it a name', amount: mkt ? 'How much did you invest?' : f.kind === 'FD' ? 'How much are you depositing?' : 'How much every month?',
     value: 'What is it worth today?', terms: f.kind === 'SIP' ? 'Set the expected return' : 'Set interest & duration', day: 'Which day does the money leave your account?', review: 'Everything look right?' }
-  const v = { enter: (d: number) => ({ x: d * 70, opacity: 0, filter: 'blur(10px)' }), center: { x: 0, opacity: 1, filter: 'blur(0px)' }, exit: (d: number) => ({ x: -d * 70, opacity: 0, filter: 'blur(10px)' }) }
+  const v = { enter: (d: number) => ({ x: d * 50, opacity: 0 }), center: { x: 0, opacity: 1 }, exit: (d: number) => ({ x: -d * 50, opacity: 0 }) }
 
   if (done) return <motion.div className="wz" initial={{ opacity: 0 }} animate={{ opacity: 1 }}><div className="done">
     {Array.from({ length: 18 }, (_, n) => <motion.i key={n} initial={{ x: 0, y: 0, scale: 1, opacity: 1 }} animate={{ x: Math.cos(n / 18 * 6.283) * 170, y: Math.sin(n / 18 * 6.283) * 170, scale: 0, opacity: 0 }} transition={{ duration: 1.1, delay: .35, ease: 'easeOut' }} />)}
     <motion.svg width="110" height="110" viewBox="0 0 100 100" initial={{ scale: .4 }} animate={{ scale: 1 }} transition={{ type: 'spring', damping: 10 }}>
-      <motion.circle cx="50" cy="50" r="44" fill="none" stroke="#E8D2B5" strokeWidth="3" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: .7 }} />
-      <motion.path d="M30 52 L45 66 L72 36" fill="none" stroke="#E8D2B5" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: .5, duration: .5 }} /></motion.svg>
+      <motion.circle cx="50" cy="50" r="44" fill="none" stroke="#D7FF3F" strokeWidth="3" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: .7 }} />
+      <motion.path d="M30 52 L45 66 L72 36" fill="none" stroke="#D7FF3F" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: .5, duration: .5 }} /></motion.svg>
     <motion.h2 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: .9 }}>Added to your wealth</motion.h2></div></motion.div>
 
-  return <motion.div className="wz" initial={{ clipPath: 'circle(0% at 90% 92%)' }} animate={{ clipPath: 'circle(150% at 90% 92%)' }} exit={{ clipPath: 'circle(0% at 90% 92%)' }} transition={{ duration: .75, ease: [.76, 0, .24, 1] }}>
+  return <motion.div className="wz" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ duration: .65, ease: [.22, 1, .36, 1] }}>
     <AnimatePresence mode="wait"><motion.div key={i} className="ghostn" initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -60 }}>{String(i + 1).padStart(2, '0')}</motion.div></AnimatePresence>
     <div className="wtop"><button onClick={() => i ? go(i - 1) : onClose()}>{i ? '←' : '✕'}</button>
       <div className="segs">{steps.map((_, n) => <span key={n}><motion.i animate={{ scaleX: n <= i ? 1 : 0 }} transition={{ duration: .5 }} /></span>)}</div>
@@ -66,10 +66,10 @@ export default function Wizard({ init, onClose, onSave }: { init: Inv; onClose: 
 
     <div className="wbody"><AnimatePresence mode="wait" custom={dir}>
       <motion.div key={s} custom={dir} variants={v} initial="enter" animate="center" exit="exit" transition={{ duration: .45, ease: [.16, 1, .3, 1] }}>
-        <div className="k" style={{ color: '#A5A79B' }}>Step {i + 1} of {steps.length}</div>
-        <h1 className="wt">{title[s]}</h1>
+        <div className="k" style={{ color: '#9b9ba8' }}>Step {i + 1} of {steps.length}</div>
+        <h1 className="wt">{title[s].split(' ').map((w, n) => <span key={n} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '.25em' }}><motion.span style={{ display: 'inline-block' }} initial={{ y: '110%' }} animate={{ y: 0 }} transition={{ delay: .08 + n * .05, duration: .6, ease: [.16, 1, .3, 1] }}>{w}</motion.span></span>)}</h1>
 
-        {s === 'who' && <div className="tiles two">{(['Shreyas', 'Divya'] as Owner[]).map(o => <motion.button key={o} className={'tile big' + (f.owner === o ? ' on' : '')} whileHover={{ y: -6 }} whileTap={{ scale: .96 }}
+        {s === 'who' && <div className="tiles two">{(['Shreyas', 'Divya'] as Owner[]).map(o => <motion.button key={o} className={'tile xl' + (f.owner === o ? ' on' : '')} whileHover={{ y: -6 }} whileTap={{ scale: .96 }}
           onClick={() => { up({ owner: o }); setTimeout(() => go(i + 1), 280) }}><span className="av">{o[0]}</span>{o}</motion.button>)}</div>}
 
         {s === 'type' && <div className="tiles">{(Object.keys(INFO) as Kind[]).map((k, n) => <motion.button key={k} className={'tile' + (f.kind === k ? ' on' : '')} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: n * .07 }} whileHover={{ x: 6 }} whileTap={{ scale: .97 }}
@@ -95,7 +95,7 @@ export default function Wizard({ init, onClose, onSave }: { init: Inv; onClose: 
             <motion.button key={a} className="rw" whileTap={{ scale: .98 }} onClick={() => go(steps.indexOf(st))}><span>{a}</span><b>{b}</b></motion.button>)}
           <div className="hl"><div className="k">{p ? 'You will have' : mkt ? 'Gain / loss' : 'Worth today'}</div>
             <div className="hv"><Roll text={inr(p ? p.v : mkt ? now.value - now.invested : now.value)} /></div>
-            {p && <div className="s" style={{ color: '#E8D2B5' }}>+{inr(p.g)} earned over {f.months} months</div>}</div>
+            {p && <div className="s" style={{ color: '#D7FF3F' }}>+{inr(p.g)} earned over {f.months} months</div>}</div>
           <motion.button className="cta" whileTap={{ scale: .97 }} onClick={confirm}><span className="shine" />Confirm investment</motion.button></div>}
       </motion.div></AnimatePresence></div>
 

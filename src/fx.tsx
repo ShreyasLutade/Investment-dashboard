@@ -20,7 +20,7 @@ export function Progress() {
 export function Spotlight() {
   const x = useMotionValue(-500), y = useMotionValue(-500)
   useEffect(() => { const m = (e: PointerEvent) => { x.set(e.clientX); y.set(e.clientY) }; addEventListener('pointermove', m); return () => removeEventListener('pointermove', m) }, [])
-  const bg = useTransform([x, y], ([a, b]) => `radial-gradient(420px circle at ${a}px ${b}px,#E8D2B522,transparent 70%)`)
+  const bg = useTransform([x, y], ([a, b]) => `radial-gradient(420px circle at ${a}px ${b}px,#D7FF3F22,transparent 70%)`)
   return <motion.div className="spot" style={{ background: bg }} />
 }
 
@@ -31,7 +31,7 @@ export function Particles() {
     const rs = () => { w = c.width = innerWidth; h = c.height = innerHeight }; rs(); addEventListener('resize', rs)
     const P = Array.from({ length: 55 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 2 + .5, v: Math.random() * .4 + .1, a: Math.random() }))
     const loop = () => { g.clearRect(0, 0, w, h); P.forEach(p => { p.y -= p.v; p.a += .01; if (p.y < -5) { p.y = h + 5; p.x = Math.random() * w }
-      g.fillStyle = `rgba(232,210,181,${.15 + Math.sin(p.a) * .15})`; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.fill() }); id = requestAnimationFrame(loop) }
+      g.fillStyle = `rgba(215,255,63,${.15 + Math.sin(p.a) * .15})`; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.fill() }); id = requestAnimationFrame(loop) }
     loop(); return () => { cancelAnimationFrame(id); removeEventListener('resize', rs) }
   }, [])
   return <canvas ref={ref} className="parts" />
@@ -48,4 +48,12 @@ export function Tilt({ children, className, ...rest }: { children: ReactNode; cl
 export function Reveal({ text, className }: { text: string; className?: string }) {
   return <h2 className={className}>{text.split(' ').map((w, i) => <span key={i} style={{ display: 'inline-block', overflow: 'hidden', marginRight: '.25em' }}>
     <motion.span style={{ display: 'inline-block' }} initial={{ y: '110%' }} whileInView={{ y: 0 }} viewport={{ once: true }} transition={{ delay: i * .08, duration: .7, ease: [.16, 1, .3, 1] }}>{w}</motion.span></span>)}</h2>
+}
+
+export function Cursor() {
+  const x = useMotionValue(-100), y = useMotionValue(-100), sx = useSpring(x, { stiffness: 500, damping: 40 }), sy = useSpring(y, { stiffness: 500, damping: 40 })
+  const [big, setBig] = useState(false)
+  useEffect(() => { const m = (e: PointerEvent) => { x.set(e.clientX); y.set(e.clientY); setBig(!!(e.target as HTMLElement).closest('button,a,input,.tile')) }
+    addEventListener('pointermove', m); return () => removeEventListener('pointermove', m) }, [])
+  return <motion.div className="cur" style={{ x: sx, y: sy }}><motion.i animate={{ scale: big ? 2.2 : 1 }} /></motion.div>
 }

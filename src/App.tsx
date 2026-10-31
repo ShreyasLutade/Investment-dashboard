@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
-import { motion, AnimatePresence, animate, useMotionValue, useTransform, useScroll } from 'framer-motion'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { motion, AnimatePresence, animate, useMotionValue, useTransform, useScroll, useAnimationFrame } from 'framer-motion'
 import Wizard from './Wizard'
-import { Splash, Progress, Spotlight, Particles, Tilt, Reveal } from './fx'
+import { Cursor, Splash, Progress, Spotlight, Particles, Tilt, Reveal } from './fx'
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts'
 import { Inv, Kind, Owner, calc, sum, inr, debits } from './calc'
 
 const KINDS: Kind[] = ['FD', 'RD', 'SIP', 'Gold', 'Stock']
-const COLORS: Record<Kind, string> = { FD: '#E8D2B5', RD: '#A5A79B', SIP: '#C9605A', Gold: '#ffc83d', Stock: '#7E8F7A' }
+const COLORS: Record<Kind, string> = { FD: '#D7FF3F', RD: '#8B6BFF', SIP: '#FF6A4D', Gold: '#ffc83d', Stock: '#4DD8FF' }
 const VIEWS = ['Together', 'Shreyas', 'Divya'] as const
 const KEY = 'wealth-v1'
 
@@ -14,6 +14,14 @@ function Count({ to }: { to: number }) {
   const mv = useMotionValue(0)
   const txt = useTransform(mv, v => inr(v))
   useEffect(() => { const c = animate(mv, to, { duration: 1.4, ease: [.16, 1, .3, 1] }); return () => c.stop() }, [to])
+  return <motion.span>{txt}</motion.span>
+}
+
+function Live({ base, perSec }: { base: number; perSec: number }) {
+  const mv = useMotionValue(0), t0 = useRef(0), [ready, setReady] = useState(false)
+  useEffect(() => { setReady(false); const c = animate(mv, base, { duration: 1.5, ease: [.16, 1, .3, 1], onComplete: () => { t0.current = performance.now(); setReady(true) } }); return () => c.stop() }, [base])
+  useAnimationFrame(() => { if (ready) mv.set(base + perSec * (performance.now() - t0.current) / 1000) })
+  const txt = useTransform(mv, v => '₹' + v.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
   return <motion.span>{txt}</motion.span>
 }
 
@@ -40,6 +48,8 @@ export default function App() {
     }
     return out
   }, [shown])
+  const perDay = useMemo(() => { const n = Date.now(), a = new Date(n), b = new Date(n + 864e5)
+    return shown.reduce((x, i) => { const c1 = calc(i, a), c2 = calc(i, b); return x + (c2.value - c2.invested) - (c1.value - c1.invested) }, 0) }, [shown])
   const { scrollY } = useScroll(); const hy = useTransform(scrollY, [0, 400], [0, -80]), ho = useTransform(scrollY, [0, 400], [1, .2])
   const people = (['Shreyas', 'Divya'] as Owner[]).map(o => ({ o, ...sum(list.filter(i => i.owner === o)) }))
 
@@ -49,9 +59,8 @@ export default function App() {
   const restore = () => { const s = prompt('Paste backup'); if (s) try { setList(JSON.parse(s)) } catch { alert('Invalid') } }
 
   return <>
-    <Splash /><Progress /><Spotlight /><Particles />
-    <div className="glow"><motion.i style={{ background: '#8a1a17', top: '-20%', left: '-20%' }} animate={{ x: [0, 80, 0], y: [0, 60, 0] }} transition={{ duration: 18, repeat: Infinity }} />
-      <motion.i style={{ background: '#E8D2B5', bottom: '-30%', right: '-20%', opacity: .15 }} animate={{ x: [0, -80, 0] }} transition={{ duration: 22, repeat: Infinity }} /></div>
+    <Cursor /><Splash /><Progress /><Spotlight /><Particles />
+    <div className="glow"><i className="orb o1" /><i className="orb o2" /><i className="orb o3" /></div>
     <div className="wrap">
       <motion.div className="top" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <div className="logo">Shreyas <b>&</b> Divya</div>
@@ -60,9 +69,10 @@ export default function App() {
 
       <motion.div className="hero" style={{ y: hy, opacity: ho }}>
         <motion.small initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{view === 'Together' ? 'Our net worth' : `${view}'s net worth`}</motion.small>
-        <div className="big"><Count to={t.value} /></div>
+        <div className="big"><Live base={t.value} perSec={perDay / 86400} /></div>
         <span className={'gain' + (gain < 0 ? ' neg' : '')}>{gain >= 0 ? '▲' : '▼'} {inr(Math.abs(gain))} · {t.invested ? ((gain / t.invested) * 100).toFixed(1) : '0.0'}%</span>
         <div className="s">Invested {inr(t.invested)}</div>
+        {perDay > 0 && <div className="live"><i />earning {inr(perDay)} every day, right now</div>}
       </motion.div>
 
       <div className="tabs">{VIEWS.map(v => <button key={v} className={view === v ? 'on' : ''} onClick={() => setView(v)}>
@@ -88,14 +98,14 @@ export default function App() {
       <motion.div className="card" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
         <div className="row"><div className="k">Growth over time</div><div className="s" style={{ margin: 0 }}>dashed = next 12 months</div></div>
         {tl.length ? <div className="chart"><ResponsiveContainer><AreaChart data={tl} key={view + list.length}>
-          <defs><linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E8D2B5" stopOpacity={.5} /><stop offset="100%" stopColor="#E8D2B5" stopOpacity={0} /></linearGradient>
-            <linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#A5A79B" stopOpacity={.4} /><stop offset="100%" stopColor="#A5A79B" stopOpacity={0} /></linearGradient></defs>
+          <defs><linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#D7FF3F" stopOpacity={.5} /><stop offset="100%" stopColor="#D7FF3F" stopOpacity={0} /></linearGradient>
+            <linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#9b9ba8" stopOpacity={.4} /><stop offset="100%" stopColor="#9b9ba8" stopOpacity={0} /></linearGradient></defs>
           <XAxis dataKey="m" tick={{ fill: '#8b8b95', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" minTickGap={30} />
           <YAxis hide domain={['dataMin', 'auto']} />
-          <Tooltip contentStyle={{ background: '#3a0907', border: '1px solid #5c2a28', borderRadius: 14 }} formatter={(v: any, n: any) => [inr(v), n === 'value' ? 'Worth' : n === 'invested' ? 'Invested' : 'Projected']} />
-          <Area type="monotone" dataKey="invested" stroke="#A5A79B" strokeWidth={2} fill="url(#gi)" animationDuration={2200} connectNulls />
-          <Area type="monotone" dataKey="value" stroke="#E8D2B5" strokeWidth={3} fill="url(#gv)" animationDuration={2600} connectNulls />
-          <Area type="monotone" dataKey="proj" stroke="#E8D2B5" strokeWidth={2} strokeDasharray="6 6" fill="none" animationBegin={2400} animationDuration={1500} connectNulls />
+          <Tooltip contentStyle={{ background: '#16161c', border: '1px solid #25252d', borderRadius: 14 }} formatter={(v: any, n: any) => [inr(v), n === 'value' ? 'Worth' : n === 'invested' ? 'Invested' : 'Projected']} />
+          <Area type="monotone" dataKey="invested" stroke="#9b9ba8" strokeWidth={2} fill="url(#gi)" animationDuration={2200} connectNulls />
+          <Area type="monotone" dataKey="value" stroke="#D7FF3F" strokeWidth={3} fill="url(#gv)" animationDuration={2600} connectNulls />
+          <Area type="monotone" dataKey="proj" stroke="#D7FF3F" strokeWidth={2} strokeDasharray="6 6" fill="none" animationBegin={2400} animationDuration={1500} connectNulls />
         </AreaChart></ResponsiveContainer></div> : <div className="s">Your growth curve appears once you add investments.</div>}
       </motion.div>
 
@@ -112,10 +122,12 @@ export default function App() {
           </Tilt> })}</AnimatePresence>
       </div>
 
-      <div className="marquee"><div>{Array(8).fill('FD • RD • SIP • GOLD • STOCKS • ').join('')}</div></div>
+      <div className="marquee"><div>{Array(8).fill("FIXED DEPOSIT ✦ RECURRING ✦ SIP ✦ GOLD ✦ STOCKS ✦ ").join("")}</div></div>
+      <div className="marquee fill"><div className="rev">{Array(8).fill("BUILDING OUR FUTURE ✦ SHREYAS & DIVYA ✦ ").join("")}</div></div>
     </div>
 
-    <motion.button className="fab" whileTap={{ scale: .92 }} initial={{ scale: 0 }} animate={{ scale: 1 }} onClick={() => setForm(blank(view === 'Divya' ? 'Divya' : 'Shreyas'))}>+ Add</motion.button>
+    <motion.button className="fab" aria-label="Add investment" initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', damping: 12, delay: 2.8 }} whileHover={{ scale: 1.08 }} whileTap={{ scale: .9 }} onClick={() => setForm(blank(view === 'Divya' ? 'Divya' : 'Shreyas'))}>
+      <svg viewBox="0 0 100 100" className="ring"><defs><path id="c" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1-76 0" /></defs><text><textPath href="#c" textLength="232" lengthAdjust="spacing">ADD ✦ INVEST ✦ ADD ✦ INVEST ✦</textPath></text></svg><span className="plus">+</span></motion.button>
 
     <AnimatePresence>{form && <Wizard key={form.id || 'new'} init={form} onClose={() => setForm(null)} onSave={save} />}</AnimatePresence>
   </>
