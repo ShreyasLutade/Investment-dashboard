@@ -20,9 +20,9 @@ export function debits(i: Inv, today = new Date()): { dates: Date[]; next?: Date
   const s = new Date(i.start), dates: Date[] = []
   let y = s.getFullYear(), m = s.getMonth(), next: Date | undefined
   for (let n = 0; n < 1200; n++) {
-    const d = clamp(y, m, i.day)
+    let d = clamp(y, m, i.day)
     m++; if (m > 11) { m = 0; y++ }
-    if (d < s) continue
+    if (d < s) { if (n === 0) d = s; else continue }  // debit day already passed in start month: first debit happens on the start date
     if (i.months && dates.length >= i.months) break
     if (d <= today) dates.push(d); else { next = d; break }
   }
